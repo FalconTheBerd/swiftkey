@@ -1,0 +1,51 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+header {
+    background-color: #1377F0;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 36px;
+}
+
+#gameSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 455px; /* Use 100% of the viewport height */
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.hidden {
+    display: none;
+}
+
+#gameText {
+    max-width: 100%; /* Ensure the text stays within the section */
+    font-size: 36px; /* Adjust the font size as needed */
+    margin: 0 auto; /* Center horizontally */
+    text-align: center; /* Align text to the center */
+}
+
+span {
+    display: flex;
+    flex-direction: block;
+}
+
+button {
+    margin-right: 10px;
+    height: 45px;
+    margin-top: 20px;
+}
+

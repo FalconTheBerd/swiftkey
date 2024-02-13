@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>KeyStrike</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="stylesheet" href="index.css">
+<body>
+
+<header>KeyStrike</header>
+
+<section id="gameSection">
+<p id="welcomeText" class="center">Welcome to Keystrike! A test of reaction time and touch typing. Can YOU get the highscore?</p>
+
+<span> <!-- Span tag puts it in line --->
+<button id="startButton">Start</button>
+<div>
+<p id="levelSelectText">Choose a level:</p>
+<select name="levels" id="levelSelect">
+  <option value="level1">Level 1</option>
+  <option value="level2">Level 2</option>
+  <option value="level3">Level 3</option>
+  <option value="level4">Level 4</option>
+</select>
+</div>
+
+
+</span>
+
+<p id="gameText" class="center hidden">Ready?</p>
+<h3 id="gameOverTitle" class="center hidden" style="color:red; font-size:50px;">Game Over</h3>
+<p id="finalScore" class="center hidden" style="font-size:20px;">Final Score: </p>
+
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>
