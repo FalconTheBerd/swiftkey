@@ -38,19 +38,26 @@ function handleKeyPress(event) {
     // Update the score and display it
     score++;
     console.log("Score:", score);
-    document.getElementById("gameText").textContent = 'Perfect!';
+    document.getElementById("perfectText").textContent = 'Perfect!';
+	document.getElementById("gameText").textContent = '_';
+  document.getElementById("perfectText").classList.remove("hidden");
     setTimeout(function () {
-      document.getElementById("gameText").textContent = '';
+      document.getElementById("perfectText").textContent = '';
+      document.getElementById("perfectText").classList.add("hidden");
     }, 500);
 
     // Remove the event listener to prevent multiple key presses
     document.removeEventListener('keydown', handleKeyPress);
   }
   else {
-    document.getElementById("gameText").textContent = 'Miss!';
+    document.getElementById("perfectText").textContent = 'Miss!';
+	document.getElementById("gameText").textContent = '_';
+  document.getElementById("perfectText").classList.remove("hidden");
+
 
     setTimeout(function () {
-      document.getElementById("gameText").textContent = '';
+      document.getElementById("perfectText").textContent = '';
+      document.getElementById("perfectText").classList.add("hidden");
     }, 500);
 
     // Remove the event listener to prevent multiple key presses
@@ -58,14 +65,19 @@ function handleKeyPress(event) {
   }
 }
 
-function levelCompleted() {
+function levelCompleted(selectedLevel) {
   console.log("Level Completed");
 
   // Show everything except the Letter
   document.getElementById("gameText").classList.add("hidden");
+  document.getElementById("perfectText").classList.add("hidden");
+  document.getElementById("perfectText").classList.remove("hidden");
   document.getElementById("gameOverTitle").classList.remove("hidden");
   document.getElementById("finalScore").classList.remove("hidden");
+  // Display different max score based on level
+  if (selectedLevel == "level1") {
   document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelOneEventCount;
+	}
 
   levelOneSong.stop();
 
@@ -87,11 +99,11 @@ function level1() {
     { timing: 4.5, letter: levelOneLetter() },
     { timing: 6.0, letter: levelOneLetter() },
     { timing: 8.0, letter: levelOneLetter() },
-    { timing: 8.5, letter: levelOneLetter() },
+    { timing: 9.0, letter: levelOneLetter() },
     { timing: 10.0, letter: levelOneLetter() },
   ]; // Example timings and letters
 
-  // Schedule levelOneEvents based on timing offsets
+  // Schedule levelOneEvents based on timing
   levelOneEvents.forEach(function (event, index) {
     setTimeout(function () {
       // Trigger an event (e.g., show a letter)
@@ -101,7 +113,7 @@ function level1() {
       if (index === levelOneEvents.length - 1) {
         // If it's the last event, call a function when the level is completed
         setTimeout(function () {
-          levelCompleted();
+          levelCompleted("level1");
         }, 1000);
       }
     }, event.timing * 1000); // Convert seconds to milliseconds

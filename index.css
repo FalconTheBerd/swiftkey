@@ -31,6 +31,13 @@ header {
     display: none;
 }
 
+#perfectText {
+    max-width: 100%; /* Ensure the text stays within the section */
+    font-size: 36px; /* Adjust the font size as needed */
+    margin: 0 auto; /* Center horizontally */
+    text-align: center; /* Align text to the center */
+}
+
 #gameText {
     max-width: 100%; /* Ensure the text stays within the section */
     font-size: 36px; /* Adjust the font size as needed */
