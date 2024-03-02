@@ -5,13 +5,13 @@ var levelOneSong = new Howl({
   // other configuration options
 });
 
-var levelOneEventCount = 7;
+var levelOneEventCount = 10;
 
 var currentLetter = null;
 var score = 0;
 
 function levelOneLetter() {
-  var lvlOneLetters = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
+  var lvlOneLetters = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ";"];
   var randomIndex = Math.floor(Math.random() * lvlOneLetters.length);
   var randomLetter = lvlOneLetters[randomIndex];
 
@@ -39,8 +39,8 @@ function handleKeyPress(event) {
     score++;
     console.log("Score:", score);
     document.getElementById("perfectText").textContent = 'Perfect!';
-	document.getElementById("gameText").textContent = '_';
-  document.getElementById("perfectText").classList.remove("hidden");
+	document.getElementById("gameText").textContent = ' ';
+  	document.getElementById("perfectText").classList.remove("hidden");
     setTimeout(function () {
       document.getElementById("perfectText").textContent = '';
       document.getElementById("perfectText").classList.add("hidden");
@@ -51,7 +51,7 @@ function handleKeyPress(event) {
   }
   else {
     document.getElementById("perfectText").textContent = 'Miss!';
-	document.getElementById("gameText").textContent = '_';
+	document.getElementById("gameText").textContent = ' ';
   document.getElementById("perfectText").classList.remove("hidden");
 
 
@@ -67,16 +67,40 @@ function handleKeyPress(event) {
 
 function levelCompleted(selectedLevel) {
   console.log("Level Completed");
+  document.getElementById("gameSection").style.backgroundImage = "none"
+  document.getElementById("gameSection").style.backgroundColor = "grey"
+
+
+  scorePercent = Math.abs(score / levelOneEventCount) * 100;
 
   // Show everything except the Letter
   document.getElementById("gameText").classList.add("hidden");
   document.getElementById("perfectText").classList.add("hidden");
-  document.getElementById("perfectText").classList.remove("hidden");
   document.getElementById("gameOverTitle").classList.remove("hidden");
   document.getElementById("finalScore").classList.remove("hidden");
   // Display different max score based on level
   if (selectedLevel == "level1") {
-  document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelOneEventCount;
+  document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelOneEventCount + " - " + scorePercent + "%";
+    if (scorePercent == 100){
+      document.getElementById("gameOverTitle").style.color = "darkgreen";
+      document.getElementById("gameOverTitle").textContent = "Amazing!";
+    }
+    else if (scorePercent >= 75 && scorePercent <= 99){
+      document.getElementById("gameOverTitle").style.color = "lightgreen";
+      document.getElementById("gameOverTitle").textContent = "Almost!";
+    }
+    else if (scorePercent >= 50 && scorePercent <= 74){
+      document.getElementById("gameOverTitle").style.color = "orange";
+      document.getElementById("gameOverTitle").textContent = "Great!";
+    }
+    else if (scorePercent >= 25 && scorePercent <= 49){
+      document.getElementById("gameOverTitle").style.color = "yellow";
+      document.getElementById("gameOverTitle").textContent = "Good!";
+    }
+    else if (scorePercent >= 0 && scorePercent <= 24){
+      document.getElementById("gameOverTitle").style.color = "red";
+      document.getElementById("gameOverTitle").textContent = "Bad!";
+    }
 	}
 
   levelOneSong.stop();
@@ -88,19 +112,23 @@ function levelCompleted(selectedLevel) {
 
 function level1() {
   console.log("Level 1 Started");
+  document.getElementById("gameSection").style.backgroundImage = "url('placeholder.JPG')"
 
   // Play the levelOneSong
   levelOneSong.play();
 
   // Define timing points and corresponding letters (adjust these values according to the song)
   var levelOneEvents = [
-    { timing: 1.5, letter: levelOneLetter() },
-    { timing: 3.0, letter: levelOneLetter() },
-    { timing: 4.5, letter: levelOneLetter() },
+    { timing: 2.0, letter: levelOneLetter() },
+    { timing: 4.0, letter: levelOneLetter() },
     { timing: 6.0, letter: levelOneLetter() },
     { timing: 8.0, letter: levelOneLetter() },
-    { timing: 9.0, letter: levelOneLetter() },
     { timing: 10.0, letter: levelOneLetter() },
+    { timing: 12.0, letter: levelOneLetter() },
+    { timing: 14.0, letter: levelOneLetter() },
+	{ timing: 16.0, letter: levelOneLetter() },
+	{ timing: 18.0, letter: levelOneLetter() },
+	{ timing: 20.0, letter: levelOneLetter() },
   ]; // Example timings and letters
 
   // Schedule levelOneEvents based on timing

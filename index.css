@@ -13,12 +13,14 @@ header {
 }
 
 #gameSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 455px; /* Use 100% of the viewport height */
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   height: calc(100vh - 82px); /* 100% of the viewport height minus header height */
+   width: 100vw; /* 100% of the viewport width */
 }
+  
 
 .center {
     display: block;
