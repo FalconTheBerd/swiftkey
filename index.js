@@ -5,13 +5,19 @@ var levelOneSong = new Howl({
   // other configuration options
 });
 
-var levelTwoSon = new Howl({
-  src: ['Save_Your_Tears.mp3'],
+var levelTwoSong = new Howl({
+  src: ['placeholder.mp3'],
+  // other configuration options
+});
+
+var levelThreeSong = new Howl({
+  src: ['placeholder.mp3'],
   // other configuration options
 });
 
 var levelOneEventCount = 10;
 var levelTwoEventCount = 10;
+var levelThreeEventCount = 10;
 
 var currentLetter = null;
 var score = 0;
@@ -33,9 +39,9 @@ function levelTwoLetter() {
 }
 
 function levelThreeLetter() { 
-  var levelThreeLetter = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';',"Z","X","C","V","B","N","M"];
-  var randomIndex = Math.floor(Math.random() * endless.length);
-  var randomLetter = levelThreeLetter[randomIndex];
+  var lvlThreeLetters = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';',"Z","X","C","V","B","N","M"];
+  var randomIndex = Math.floor(Math.random() * lvlThreeLetters.length);
+  var randomLetter = lvlThreeLetters[randomIndex];
   
   return randomLetter;
 }
@@ -214,8 +220,11 @@ function level2() {
 
 }
 
-function endless(){
+function level3(){
   console.log("level Three Started");
+  
+  // Need a level 3 song
+  //levelThreeSong.play()
 
   var levelTwoEvents = [
     { timing: 3.0, letter: levelThreeLetter()},
@@ -239,7 +248,7 @@ function endless(){
       if (index === levelThreeEvents.length - 1) {
         // If it's the last event, call a function when the level is completed
         setTimeout(function () {
-          levelCompleted("level1"); //got to chage this i think
+          levelCompleted("level3"); //got to chage this i think
         }, 1000);
       }
     }, event.timing * 1000); // Convert seconds to milliseconds
@@ -247,6 +256,10 @@ function endless(){
 
 }
 
+function endless(){
+  // This is the fun part
+  // You have to create your own logic for this
+}
 
 // Add an event listener for the button press
 document.getElementById("startButton").addEventListener("click", function () {
@@ -267,6 +280,8 @@ document.getElementById("startButton").addEventListener("click", function () {
     level2();
   } else if (selectedLevel === "level3"){
     level3()
+  } else if (selectedLevel === "endless"){
+    endless()
   }
   
 
