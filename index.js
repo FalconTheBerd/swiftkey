@@ -18,6 +18,9 @@ var levelThreeSong = new Howl({
 var levelOneEventCount = 10;
 var levelTwoEventCount = 10;
 var levelThreeEventCount = 10;
+var endlessStatus = 0;
+// start speed for endless mode
+var endlessTiming = 3;
 
 var currentLetter = null;
 var score = 0;
@@ -38,10 +41,11 @@ function levelTwoLetter() {
   return randomLetter;
 }
 
-function levelThreeLetter() { 
-  var lvlThreeLetters = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';',"Z","X","C","V","B","N","M"];
-  var randomIndex = Math.floor(Math.random() * lvlThreeLetters.length);
-  var randomLetter = lvlThreeLetters[randomIndex];
+
+function endlessLetter() { 
+  var endlessLetters = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',"Z","X","C","V","B","N","M",'Q','W','E','R','T','Y','U','I','O','P'];
+  var randomIndex = Math.floor(Math.random() * endlessLetters.length);
+  var randomLetter = endlessLetters[randomIndex];
   
   return randomLetter;
 }
@@ -78,9 +82,10 @@ function handleKeyPress(event) {
     document.removeEventListener('keydown', handleKeyPress);
   }
   else {
-    document.getElementById("perfectText").textContent = 'Miss!';
-	document.getElementById("gameText").textContent = ' ';
-  document.getElementById("perfectText").classList.remove("hidden");
+      document.getElementById("perfectText").textContent = 'Miss!';
+	    document.getElementById("gameText").textContent = ' ';
+      document.getElementById("perfectText").classList.remove("hidden");
+      endlessStatus = 0;
 
 
     setTimeout(function () {
@@ -113,7 +118,11 @@ function levelCompleted(selectedLevel) {
 	} else if (selectedLevel == "level2"){
     scorePercent = Math.abs(score / levelTwoEventCount) * 100;
     document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelTwoEventCount + " - " + scorePercent + "%";
+  } else if (selectedLevel == "endless"){
+    scorePercent = "100";
+    document.getElementById("finalScore").textContent = "Final Score: " + score;
   }
+  
   
   if (scorePercent == 100){
     document.getElementById("gameOverTitle").style.color = "darkgreen";
@@ -220,46 +229,39 @@ function level2() {
 
 }
 
-function level3(){
-  console.log("level Three Started");
-  
-  // Need a level 3 song
-  //levelThreeSong.play()
 
-  var levelTwoEvents = [
-    { timing: 3.0, letter: levelThreeLetter()},
-    { timing: 5.0, letter: levelThreeLetter()},
-    { timing: 7.0, letter: levelThreeLetter()},
-    { timing: 9.0, letter: levelThreeLetter()},
-    { timing: 11.0, letter: levelThreeLetter()},
-    { timing: 13.0, letter: levelThreeLetter()},
-    { timing: 15.0, letter: levelThreeLetter()},
-    { timing: 17.0, letter: levelThreeLetter()},
-    { timing: 19.0, letter: levelThreeLetter()},
-    { timing: 21.0, letter: levelThreeLetter()}
-  ] // example timings for level two letters
+function endless() {
+  endlessStatus = 1;
+  var intervalId;
+  var initialTiming = endlessTiming;
 
-  levelThreeEvents.forEach(function (event, index) {
-    setTimeout(function () {
-      // Trigger an event (e.g., show a letter)
-      showLetter(event.letter);
+  intervalId = setInterval(function () {
+    if (endlessStatus !== 1) {
+      clearInterval(intervalId);
+      levelCompleted("endless");
+      return;
+    }
 
-      // Check if it's the last event
-      if (index === levelThreeEvents.length - 1) {
-        // If it's the last event, call a function when the level is completed
-        setTimeout(function () {
-          levelCompleted("level3"); //got to chage this i think
-        }, 1000);
-      }
-    }, event.timing * 1000); // Convert seconds to milliseconds
-  });
+    showLetter(endlessLetter());
 
+    // Speed increase
+    initialTiming -= 0.1;
+
+    // max speed
+    initialTiming = Math.max(initialTiming, 1);
+
+    endlessTiming = initialTiming;
+
+    // Set a new interval with the updated timing
+    clearInterval(intervalId);
+    intervalId = setInterval(arguments.callee, initialTiming * 1000);
+    console.log(initialTiming)
+
+  }, initialTiming * 1000);
 }
 
-function endless(){
-  // This is the fun part
-  // You have to create your own logic for this
-}
+
+
 
 // Add an event listener for the button press
 document.getElementById("startButton").addEventListener("click", function () {
