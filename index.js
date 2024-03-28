@@ -15,12 +15,18 @@ var levelThreeSong = new Howl({
   // other configuration options
 });
 
+var endlessSong = new Howl({
+	src: ['Stay_Inside_Me.mp3'],
+  // other configuration options
+});
+
 var levelOneEventCount = 10;
 var levelTwoEventCount = 10;
 var levelThreeEventCount = 10;
 var endlessStatus = 0;
 // start speed for endless mode
 var endlessTiming = 3;
+var songPlaying = 0;
 
 var currentLetter = null;
 var score = 0;
@@ -103,11 +109,13 @@ function levelCompleted(selectedLevel) {
   document.getElementById("gameSection").style.backgroundImage = "none"
   document.getElementById("gameSection").style.backgroundColor = "grey"
 
+  songPlaying = 0;
 
   // Show everything except the Letter
   document.getElementById("gameText").classList.add("hidden");
   document.getElementById("perfectText").classList.add("hidden");
   document.getElementById("gameOverTitle").classList.remove("hidden");
+  document.getElementById("highScore").classList.remove("hidden");
   document.getElementById("finalScore").classList.remove("hidden");
 
 
@@ -115,12 +123,30 @@ function levelCompleted(selectedLevel) {
   if (selectedLevel == "level1") {
     scorePercent = Math.abs(score / levelOneEventCount) * 100;
     document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelOneEventCount + " - " + scorePercent + "%";
-	} else if (selectedLevel == "level2"){
+	
+	
+	if (localStorage.getItem("levelOneHS") < score){
+	localStorage.setItem("levelOneHS", score)
+	}
+	console.log("High Score: " + localStorage.getItem("levelOneHS"))
+	document.getElementById("highScore").textContent ="High Score: " +  localStorage.getItem("levelOneHS")
+	
+  } else if (selectedLevel == "level2"){
     scorePercent = Math.abs(score / levelTwoEventCount) * 100;
     document.getElementById("finalScore").textContent = "Final Score: " + score + "/" + levelTwoEventCount + " - " + scorePercent + "%";
-  } else if (selectedLevel == "endless"){
+	
+	if (localStorage.getItem("levelTwoHS") < score){
+	localStorage.setItem("levelTwoHS", score)
+	}
+	console.log("High Score: " + localStorage.getItem("levelTwoHS"))
+	document.getElementById("highScore").textContent = localStorage.getItem("levelTwoHS")
+	
+	
+} else if (selectedLevel == "endless"){
     scorePercent = "100";
     document.getElementById("finalScore").textContent = "Final Score: " + score;
+	localStorage.setItem("endlessHS", score)
+	console.log("High Score: " + localStorage.getItem("endlessHS"))
   }
   
   
@@ -156,27 +182,32 @@ function levelCompleted(selectedLevel) {
 function level1() {
   console.log("Level 1 Started");
   document.getElementById("gameSection").style.backgroundImage = "url('placeholder.JPG')"
-
-  // Play the levelOneSong
-  levelOneSong.play();
+  
 
   // Define timing points and corresponding letters (adjust these values according to the song)
   var levelOneEvents = [
-    { timing: 2.0, letter: levelOneLetter() },
-    { timing: 4.0, letter: levelOneLetter() },
-    { timing: 6.0, letter: levelOneLetter() },
-    { timing: 8.0, letter: levelOneLetter() },
-    { timing: 10.0, letter: levelOneLetter() },
-    { timing: 12.0, letter: levelOneLetter() },
-    { timing: 14.0, letter: levelOneLetter() },
-	  { timing: 16.0, letter: levelOneLetter() },
-	  { timing: 18.0, letter: levelOneLetter() },
-	  { timing: 20.0, letter: levelOneLetter() },
-  ]; // Example timings and letters
+    { timing: 1.012, letter: levelOneLetter() },
+    { timing: 2.024, letter: levelOneLetter() },
+    { timing: 6.036, letter: levelOneLetter() },
+    { timing: 8.048, letter: levelOneLetter() },
+    { timing: 10.06, letter: levelOneLetter() },
+    { timing: 12.072, letter: levelOneLetter() },
+    { timing: 14.084, letter: levelOneLetter() },
+    { timing: 16.096, letter: levelOneLetter() },
+    { timing: 18.108, letter: levelOneLetter() },
+    { timing: 20.12, letter: levelOneLetter() },
+	 ];
+
 
   // Schedule levelOneEvents based on timing
   levelOneEvents.forEach(function (event, index) {
     setTimeout(function () {
+	  if (songPlaying == 0){
+	    // Play the levelOneSong
+        levelOneSong.play(); 
+		songPlaying = 1;  
+	};
+	  
       // Trigger an event (e.g., show a letter)
       showLetter(event.letter);
 
@@ -231,6 +262,8 @@ function level2() {
 
 
 function endless() {
+	
+  
   endlessStatus = 1;
   var intervalId;
   var initialTiming = endlessTiming;
@@ -241,11 +274,14 @@ function endless() {
       levelCompleted("endless");
       return;
     }
-
+	if (songPlaying == 0){
+		endlessSong.play()
+		songPlaying = 1;
+	}
     showLetter(endlessLetter());
 
     // Speed increase
-    initialTiming -= 0.1;
+    initialTiming -= 0.07;
 
     // max speed
     initialTiming = Math.max(initialTiming, 1);
