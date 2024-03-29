@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SwiftKey</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+
+<body>
+    <header>SwiftKey Multiplayer</header>
+    <section id="gameSection">
+        <span id="playersText">Enter your name</span>
+        <input type="text" id="usernameInput" placeholder="Your username">
+        <span id="buttonContainer">
+            <button id="startButton">Start</button>
+        </span>
+        <div id="readyText">Ready?</div>
+        <div id="playersInfo">
+            <div class="playerContainer">
+                <div class="playerName" id="leftPlayerName"></div>
+                <div class="playerBox" id="leftPlayerBox">0</div>
+                <span id="leftPlayerCrosses">❌❌❌</span>
+            </div>
+            <div class="playerContainer">
+                <div class="playerName" id="rightPlayerName"></div>
+                <div class="playerBox" id="rightPlayerBox">0</div>
+                <span id="rightPlayerCrosses">❌❌❌</span>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getDatabase, ref, child, onValue, set, onDisconnect, remove, get } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB14wfhgRsORI-glDhwEsSDGZCotdmKmww",
+            authDomain: "swiftkey-e3293.firebaseapp.com",
+            databaseURL: "https://swiftkey-e3293-default-rtdb.firebaseio.com",
+            projectId: "swiftkey-e3293",
+            storageBucket: "swiftkey-e3293.appspot.com",
+            messagingSenderId: "197767621562",
+            appId: "1:197767621562:web:d8d8d956e602af68b70b83",
+            measurementId: "G-M0XWRNFNNB"
+        };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        const db = getDatabase();
+
+        const usersRef = ref(db, 'waiting_users');
+        const gamePlayersRef = ref(db, 'game_players');
+        const commonStateRef = ref(db, 'common_state');
+
+        // Listen for changes in the number of waiting users
+        onValue(usersRef, (snapshot) => {
+            const users = snapshot.val();
+            if (users && Object.keys(users).length === 2) {
+                startGame();
+            }
+        });
+
+        function startGame() {
+            document.getElementById('playersText').textContent = "Play game";
+            document.getElementById('playersText').style.display = "none";
+            document.getElementById('playersInfo').style.display = 'flex';
+
+            // Retrieve usernames from the database
+            const usersRef = ref(db, 'waiting_users');
+            get(usersRef).then((snapshot) => {
+                const users = snapshot.val();
+                if (users) {
+                    const usernames = Object.keys(users);
+                    if (usernames.length === 2) {
+                        const leftPlayerUsername = usernames[0];
+                        const rightPlayerUsername = usernames[1];
+
+                        // Set usernames above player boxes
+                        document.getElementById('leftPlayerName').textContent = leftPlayerUsername;
+                        document.getElementById('rightPlayerName').textContent = rightPlayerUsername;
+
+                        // Remove players from waiting_users
+                        remove(usersRef);
+
+                        // Add players to game_players
+                        const leftPlayerRef = child(gamePlayersRef, leftPlayerUsername);
+                        const rightPlayerRef = child(gamePlayersRef, rightPlayerUsername);
+                        set(leftPlayerRef, { score: 0, lives: 3 });
+                        set(rightPlayerRef, { score: 0, lives: 3 });
+
+                        // Start the game loop
+                        startGameLoop();
+                    }
+                }
+            }).catch((error) => {
+                console.error("Error fetching usernames: ", error);
+            });
+        }
+
+        // Function to start the game loop
+        function startGameLoop() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const readyText = document.getElementById('readyText');
+            readyText.style.display = 'block';
+
+            // Display the "Ready?" text for 3 seconds
+            readyText.textContent = "Ready?";
+            setTimeout(() => {
+                readyText.textContent = ''; // Hide the "Ready?" text
+            }, 3000);
+
+            // Loop to generate and display letters
+            setInterval(() => {
+                // Generate random letter
+                const randomLetterIndex = Math.floor(Math.random() * alphabet.length);
+                const randomLetter = alphabet[randomLetterIndex];
+                readyText.textContent = randomLetter;
+
+                // Start timer to hide the letter after 2 seconds
+                setTimeout(() => {
+                    readyText.textContent = ''; // Hide the letter
+                }, 2000);
+            }, 4000);
+
+            // Listen for keypress events
+            document.addEventListener('keypress', keyPressHandler);
+
+            // Update scoreboard periodically
+            setInterval(updateScoreboard, 1000); // Update every second
+        }
+
+        // Event handler for keypress events
+        function keyPressHandler(event) {
+            const pressedLetter = event.key.toUpperCase();
+            const displayedLetter = document.getElementById('readyText').textContent;
+            if (pressedLetter === displayedLetter) {
+                // Update score in the database
+                updateScore(1);
+            } else {
+                // Update lives in the database
+                updateLives(-1);
+            }
+        }
+
+        // Function to update the score in the database
+        function updateScore(score) {
+            const username = document.getElementById('usernameInput').value;
+            const userRef = child(gamePlayersRef, username);
+            get(userRef).then((snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    const newScore = userData.score + score;
+                    set(userRef, { ...userData, score: newScore });
+                }
+            }).catch((error) => {
+                console.error("Error updating score: ", error);
+            });
+        }
+
+        // Function to update the lives in the database
+        function updateLives(lives) {
+            const username = document.getElementById('usernameInput').value;
+            const userRef = child(gamePlayersRef, username);
+            get(userRef).then((snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    const newLives = userData.lives + lives;
+                    if (newLives <= 0) {
+                        // Display victory/defeat message
+                        const message = (lives < 0) ? "Defeat!" : "Victory!";
+                        alert(message);
+
+                        // Clear the database
+                        set(userRef, null);
+
+                        // Reload the page
+                        location.reload();
+                    } else {
+                        // Update lives
+                        set(userRef, { ...userData, lives: newLives });
+                    }
+                }
+            }).catch((error) => {
+                console.error("Error updating lives: ", error);
+            });
+        }
+
+
+        // Function to update the scoreboard
+        function updateScoreboard() {
+            // Retrieve usernames from the database
+            const usersRef = ref(db, 'game_players');
+            get(usersRef).then((snapshot) => {
+                const players = snapshot.val();
+                if (players) {
+                    const leftPlayer = Object.keys(players)[0];
+                    const rightPlayer = Object.keys(players)[1];
+                    const leftPlayerData = players[leftPlayer];
+                    const rightPlayerData = players[rightPlayer];
+
+                    // Update left player's score and lives
+                    if (leftPlayerData) {
+                        document.getElementById('leftPlayerBox').textContent = leftPlayerData.score || 0;
+                        document.getElementById('leftPlayerCrosses').textContent = '❌'.repeat(leftPlayerData.lives || 0);
+                    } else {
+                        // If left player data is not available, reset the values
+                        document.getElementById('leftPlayerBox').textContent = '0';
+                        document.getElementById('leftPlayerCrosses').textContent = '';
+                    }
+
+                    // Update right player's score and lives
+                    if (rightPlayerData) {
+                        document.getElementById('rightPlayerBox').textContent = rightPlayerData.score || 0;
+                        document.getElementById('rightPlayerCrosses').textContent = '❌'.repeat(rightPlayerData.lives || 0);
+                    } else {
+                        // If right player data is not available, reset the values
+                        document.getElementById('rightPlayerBox').textContent = '0';
+                        document.getElementById('rightPlayerCrosses').textContent = '';
+                    }
+                }
+            }).catch((error) => {
+                console.error("Error updating scoreboard: ", error);
+            });
+        }
+
+
+
+        function checkWinnerOrLoser(username, lives) {
+            console.log("Checking winner or loser...");
+            if (lives <= 0) {
+                console.log("Player has 0 lives...");
+                const userRef = child(gamePlayersRef, username);
+                get(userRef).then((snapshot) => {
+                    console.log("Retrieving user data...");
+                    const userData = snapshot.val();
+                    if (userData && userData.lives <= 0) {
+                        console.log("User is the winner or loser...");
+                        const message = (username === userData.username) ? "Victory!" : "Defeat!";
+                        alert(message);
+                        set(userRef, null); // Clear the user data from the database
+                        location.reload(); // Reload the page
+                    }
+                }).catch((error) => {
+                    console.error("Error checking winner or loser: ", error);
+                });
+            }
+        }
+
+        // Listen for changes in the player's lives
+        onValue(gamePlayersRef, (snapshot) => {
+            console.log("Listening for changes in player's lives...");
+            const players = snapshot.val();
+            if (players) {
+                // Check lives for each player
+                Object.keys(players).forEach(username => {
+                    console.log("Checking lives for player: ", username);
+                    checkWinnerOrLoser(username, players[username].lives);
+                });
+            }
+        });
+
+
+        // Function to add user to waiting list
+        function addUserToWaitingList(username) {
+            const userRef = child(usersRef, username);
+            set(userRef, true);
+            // Remove user from waiting list when they disconnect
+            onDisconnect(userRef).remove();
+        }
+
+        // Listener for page unload event to remove players from game_players
+        window.addEventListener('unload', function () {
+            if (gamePlayersRef) {
+                const username = document.getElementById('usernameInput').value;
+                remove(child(gamePlayersRef, username));
+            }
+        });
+
+        // Event listener for start button
+        document.getElementById('startButton').addEventListener('click', function () {
+            var username = document.getElementById('usernameInput').value;
+            if (username.trim() === "") {
+                alert("Please enter a username to start the game.");
+                return;
+            }
+            addUserToWaitingList(username);
+            document.getElementById('playersText').textContent = "Waiting for other player...";
+            document.getElementById('usernameInput').style.display = 'none';
+            document.getElementById('buttonContainer').style.display = 'none';
+        });
+
+        // Function to start updating the scoreboard periodically
+        function startScoreboardUpdate() {
+            setInterval(updateScoreboard, 500); // Update scoreboard every 5 seconds (adjust as needed)
+        }
+
+        // Call the function to start updating the scoreboard
+        startScoreboardUpdate();
+
+    </script>
+
+
+
+
+</body>
+
+</html>
