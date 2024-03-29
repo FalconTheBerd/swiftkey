@@ -105,11 +105,15 @@ function handleKeyPress(event) {
 }
 
 function levelCompleted(selectedLevel) {
+
+  updateHS(selectedLevel, score, document.getElementById(nameInput))
+
   console.log("Level Completed");
   document.getElementById("gameSection").style.backgroundImage = "none"
   document.getElementById("gameSection").style.backgroundColor = "grey"
 
   songPlaying = 0;
+
 
   // Show everything except the Letter
   document.getElementById("gameText").classList.add("hidden");
@@ -117,6 +121,8 @@ function levelCompleted(selectedLevel) {
   document.getElementById("gameOverTitle").classList.remove("hidden");
   document.getElementById("highScore").classList.remove("hidden");
   document.getElementById("finalScore").classList.remove("hidden");
+  document.getElementById("nameInput").classList.remove("hidden");
+
 
 
   // Display different max score based on level
@@ -310,6 +316,8 @@ document.getElementById("startButton").addEventListener("click", function () {
   document.getElementById("levelSelectText").classList.add("hidden");
   document.getElementById("startButton").classList.add("hidden");
   document.getElementById("welcomeText").classList.add("hidden");
+  document.getElementById("nameInput").classList.add("hidden");
+
 
   // Start the game
   if (selectedLevel == "level1") {
