@@ -62,7 +62,7 @@
         const commonStateRef = ref(db, 'common_state');
 
         // Flag to track whether the letter is changing
-        let letterChanging = false;
+        let letterChanging = false;  
 
         // Listen for changes in the number of waiting users
         onValue(usersRef, (snapshot) => {
