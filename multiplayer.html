@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>SwiftKey</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         /* Your CSS styles here */
     </style>
@@ -37,6 +37,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
     <script type="module">
+		
+		var letterSpeed = 2
+		
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getDatabase, ref, child, onValue, set, onDisconnect, remove, get } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
@@ -131,7 +134,8 @@
                 // Start timer to hide the letter after 2 seconds
                 setTimeout(() => {
                     readyText.textContent = ''; // Hide the letter
-                }, 2000);
+					letterSpeed = letterSpeed - 0.1
+                }, letterSpeed*1000);
             }, 4000);
 
             // Listen for keypress events
